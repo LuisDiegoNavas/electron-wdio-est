@@ -59,14 +59,15 @@ export const config = {
               'electron',
               {
                 appPath: join(__dirname, 'dist'),
-                // appPath: path.join(__dirname, 'Anatha.app/Contents/MacOS/Anatha'),
+                //appPath: path.join(__dirname, 'Anatha.app/Contents/MacOS/Anatha'),
                 //appName: 'Anatha',
                 appName: 'wdio-electron-service-example',
                 //appArgs: ['--headless', '--disable-dev-shm-usage'],
+                newSessionPerTest: false,
                 chromedriver: {
-                  //port: 9519,
-                  args: ['--headless', '--disable-dev-shm-usage'],
+                  port: 9515,
                   //logFileName: 'wdio-chromedriver.log',
+                  chromedriverCustomPath: '/node_modules/electron-chromedriver/bin/chromedriver'
                 },
               },
             ]
