@@ -1,0 +1,53 @@
+name: Automation deployment
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+    
+    env:
+      NODE_ENV: 'qa'
+      TEST_ENVIRONMENT: 'qa'
+      BASE_URL: 'app://./index.html'
+      PROJECT: 'nameproject'
+      BROWSER: 'chrome'
+      AdminUser: 'Aletesting1234!'
+      AdminUserPassword: 'Change1234!'
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
+
+      - name: Download chrome driver
+        uses: nanasess/setup-chromedriver@master
+
+      - name: Launch chrome driver
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
+          
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Build and Run Automation
+        run: |
+          ls
+          npm install
+          npm run wdiots
