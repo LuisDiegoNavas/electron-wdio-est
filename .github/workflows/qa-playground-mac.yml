@@ -1,5 +1,4 @@
 # github action name
-
 name: Automation deployment
 
 on:
@@ -10,12 +9,10 @@ on:
 
 jobs:
   build_on_mac:
-
     runs-on: macos-latest
-
     strategy:
-      matrix:
-        node-version: [16.x]
+        matrix:
+          node-version: [16.x]
 
     steps:
       - name: Set up Chrome
@@ -31,14 +28,14 @@ jobs:
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-          
+
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      
+
       - name: Build and Run Automation
         run: |
           ls
