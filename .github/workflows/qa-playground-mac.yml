@@ -38,5 +38,6 @@ jobs:
           
       - name: Run Automation
         run: |
+          node_modules/electron-chromedriver/bin/chromedriver
           sudo lsof -PiTCP -sTCP:LISTEN
           npm run wdiots
