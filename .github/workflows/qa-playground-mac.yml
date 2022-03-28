@@ -1,4 +1,5 @@
-name: Automation deployment
+# github action name
+name: Playground MacOS
 
 on:
   workflow_dispatch:
@@ -11,23 +12,99 @@ on:
         options:
         - info
         - warning
-        - debug
+        - debug      
 
 jobs:
-  build:
-
-    runs-on: macos-latest
-    
+  build_on_mac:
+    runs-on: macos-10.15
     env:
-      NODE_ENV: 'qa'
-      TEST_ENVIRONMENT: 'qa'
+      NODE_ENV: 'desktop'
+      TEST_ENVIRONMENT: 'desktop'
       BASE_URL: 'app://./index.html'
       PROJECT: 'nameproject'
       BROWSER: 'chrome'
       AdminUser: 'Aletesting1234!'
       AdminUserPassword: 'Change1234!'
+      
+    steps:
+      - name: Git checkout branch
+        uses: actions/checkout@v2
+        with:
+          ref: ANBAC/ci-actions-working-all-platforms
+          
+      - name: Installing Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-    strategy:
-      matrix:
-        node-version: [16.x]
+      - name: Setup SSH step 1
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.READ_ONLY_SSH_KEY }}
 
+      - name: Setup SSH step 2
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p /Users/runner/.ssh
+          echo "${{ secrets.READ_ONLY_SSH_KEY }}" > /Users/runner/.ssh/github_actions
+          chmod 600 /Users/runner/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add /Users/runner/.ssh/github_actions
+          
+      - name: Installing yarn
+        run: |
+          npm install --global yarn
+          
+      - name: Installing node-gyp
+        run: |
+          npm install --global node-gyp
+          
+      - name: Install Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3'
+
+      - name: Install Anatha common SDK
+        run: |
+          npm install       
+          npm run build
+          npm run build:locales
+        working-directory: common
+
+      - name: Build and pack Desktop Wallet
+        run: |
+          yarn install       
+          yarn pack:mac
+          ls dist
+        working-directory: wallet-desktop
+        
+      - name: Install Anatha app
+        run: |
+          cd dist
+          sudo installer -pkg Anatha-2.0.0-5.pkg -target ~
+          sudo spctl --master-disable
+          open -a Anatha
+          pkill -x Anatha
+          cd /Applications
+          ls
+          sudo lsof -PiTCP -sTCP:LISTEN
+        working-directory: wallet-desktop
+
+      - name: Build Desktop Automation
+        run: |
+          npm install
+        working-directory: wallet-desktop/test/automation/desktop
+
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npm run wdio wdio.conf.ts
+          working-directory: wallet-desktop/test/automation/desktop
+        
+      - name: Run Desktop Automation
+        run: |
+          export NODE_ENV="desktop"
+          node viewCurrentenv.js
+          run: npm run wdio wdio.conf.ts
+        working-directory: wallet-desktop/test/automation/desktop
