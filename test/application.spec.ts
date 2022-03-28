@@ -6,7 +6,7 @@ describe('Onbording', function () {
     const title = await browser.getTitle();
     expect(title).toEqual('Test');
     await browser.pause(4000)
-    const elem = await $('disabled-checkbox')
+    const elem = await $('#disabled-checkbox')
     elem.click()
     const elem2 = await $('.make-bigger')
     elem2.click()
