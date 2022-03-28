@@ -1,110 +1,56 @@
 # github action name
-name: Playground MacOS
+
+name: Automation deployment
 
 on:
-  workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'Log level'     
-        required: true
-        default: 'debug' 
-        type: choice
-        options:
-        - info
-        - warning
-        - debug      
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
-  build_on_mac:
-    runs-on: macos-10.15
+  build:
+
+    runs-on: macos-latest
+    
     env:
-      NODE_ENV: 'desktop'
-      TEST_ENVIRONMENT: 'desktop'
+      NODE_ENV: 'qa'
+      TEST_ENVIRONMENT: 'qa'
       BASE_URL: 'app://./index.html'
       PROJECT: 'nameproject'
       BROWSER: 'chrome'
       AdminUser: 'Aletesting1234!'
       AdminUserPassword: 'Change1234!'
-      
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
     steps:
-      - name: Git checkout branch
-        uses: actions/checkout@v2
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@latest
         with:
-          ref: ANBAC/ci-actions-working-all-platforms
+          chrome-version: stable
+
+      - name: Download chrome driver
+        uses: nanasess/setup-chromedriver@master
+
+      - name: Launch chrome driver
+        run: |
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
           
-      - name: Installing Node
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
-      - name: Setup SSH step 1
-        uses: webfactory/ssh-agent@v0.4.1
-        with:
-          ssh-private-key: ${{ secrets.READ_ONLY_SSH_KEY }}
-
-      - name: Setup SSH step 2
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Build and Run Automation
         run: |
-          mkdir -p /Users/runner/.ssh
-          echo "${{ secrets.READ_ONLY_SSH_KEY }}" > /Users/runner/.ssh/github_actions
-          chmod 600 /Users/runner/.ssh/github_actions
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add /Users/runner/.ssh/github_actions
-          
-      - name: Installing yarn
-        run: |
-          npm install --global yarn
-          
-      - name: Installing node-gyp
-        run: |
-          npm install --global node-gyp
-          
-      - name: Install Python 3
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3'
-
-      - name: Install Anatha common SDK
-        run: |
-          npm install       
-          npm run build
-          npm run build:locales
-        working-directory: common
-
-      - name: Build and pack Desktop Wallet
-        run: |
-          yarn install       
-          yarn pack:mac
-          ls dist
-        working-directory: wallet-desktop
-        
-      - name: Install Anatha app
-        run: |
-          cd dist
-          sudo installer -pkg Anatha-2.0.0-5.pkg -target ~
-          sudo spctl --master-disable
-          open -a Anatha
-          pkill -x Anatha
-          cd /Applications
           ls
-          sudo lsof -PiTCP -sTCP:LISTEN
-        working-directory: wallet-desktop
-
-      - name: Build Desktop Automation
-        run: |
           npm install
-        working-directory: wallet-desktop/test/automation/desktop
-
-      - name: Run headless test
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: npm run wdio wdio.conf.ts
-          working-directory: wallet-desktop/test/automation/desktop
-        
-      - name: Run Desktop Automation
-        run: |
-          export NODE_ENV="desktop"
-          node viewCurrentenv.js
-          run: npm run wdio wdio.conf.ts
-        working-directory: wallet-desktop/test/automation/desktop
+          npm run build
+          npm run wdiots
