@@ -12,15 +12,6 @@ jobs:
   build_on_mac:
 
     runs-on: macos-latest
-    
-    env:
-      NODE_ENV: 'qa'
-      TEST_ENVIRONMENT: 'qa'
-      BASE_URL: 'app://./index.html'
-      PROJECT: 'nameproject'
-      BROWSER: 'chrome'
-      AdminUser: 'Aletesting1234!'
-      AdminUserPassword: 'Change1234!'
 
     strategy:
       matrix:
