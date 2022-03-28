@@ -17,11 +17,18 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    strategy:
-        matrix:
-          node-version: [16.x]
 
     steps:
+      - name: Git checkout branch
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          
+      - name: Installing Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@latest
         with:
@@ -35,13 +42,6 @@ jobs:
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
-
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       - name: Build and Run Automation
         run: |
