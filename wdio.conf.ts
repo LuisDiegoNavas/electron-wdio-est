@@ -53,7 +53,7 @@ export const config = {
   waitforTimeout: 10000,
   connectionRetryTimeout: 120000,
   connectionRetryCount: 1,
-  port: 9515,
+  //port: 9515,
   services: [
           [
               'electron',
