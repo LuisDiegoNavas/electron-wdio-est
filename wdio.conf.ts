@@ -67,7 +67,7 @@ export const config = {
                 chromedriver: {
                   port: 9515,
                   //logFileName: 'wdio-chromedriver.log',
-                  chromedriverCustomPath: '/node_modules/electron-chromedriver/bin/chromedriver'
+                  chromedriverCustomPath: 'node_modules/.bin/chromedriver'
                 },
               },
             ]
