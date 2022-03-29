@@ -38,5 +38,6 @@ jobs:
           
       - name: Run Automation
         run: |
+          id
           sudo lsof -PiTCP -sTCP:LISTEN
           npm run wdiots
