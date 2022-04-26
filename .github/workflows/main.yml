@@ -40,5 +40,6 @@ jobs:
           npm install
           echo Add other actions to build,
           echo test, and deploy your project.
+          export NODE_ENV="desktop"
           node viewEnv.js
           echo ${{ secrets.desktop.NODE_ENV }} | sed 's/./& /g'
