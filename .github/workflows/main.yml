@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: desktop
     env:
-      NODE_ENV: ${{ secrets.desktop.NODE_ENV }}
-      TEST_ENVIRONMENT: ${{ secrets.desktop.TEST_ENVIRONMENT }}
-      BASE_URL: ${{ secrets.desktop.BASE_URL }}
-      PROJECT: ${{ secrets.desktop.PROJECT }}
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+      TEST_ENVIRONMENT: ${{ secrets.TEST_ENVIRONMENT }}
+      BASE_URL: ${{ secrets.BASE_URL }}
+      PROJECT: ${{ secrets.PROJECT }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
