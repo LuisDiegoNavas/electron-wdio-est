@@ -21,11 +21,11 @@ on:
 
 jobs:
   build:
+    if: "${{ github.event.inputs.environment == 'Prod' }}"
     runs-on: macos-latest
     env:
       LEVEL: ${{ github.event.inputs.logLevel }}
       ENVIRONMENT: ${{ github.event.inputs.environment }}
-    if: $ENVIRONMENT == 'PROD'
     steps:
       - name: Git checkout branch
         uses: actions/checkout@v2
