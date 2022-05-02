@@ -22,9 +22,7 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    env:
-      NODE_ENV: '${{ github.event.inputs.environment }}'
-    if: NODE_ENV == 'PROD'
+    if: '${{ github.event.inputs.environment }}' == 'PROD'
     steps:
       - name: Git checkout branch
         uses: actions/checkout@v2
