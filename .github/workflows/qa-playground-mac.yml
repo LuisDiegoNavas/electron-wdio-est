@@ -13,11 +13,18 @@ on:
         - info
         - warning
         - debug
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+        default: 'Dev'
 
 jobs:
   build:
     runs-on: macos-latest
-
+    env:
+      NODE_ENV: '${{ github.event.inputs.environment }}'
+    if: NODE_ENV == 'PROD'
     steps:
       - name: Git checkout branch
         uses: actions/checkout@v2
