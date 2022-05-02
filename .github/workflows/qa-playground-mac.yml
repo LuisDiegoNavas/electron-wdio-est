@@ -22,7 +22,7 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    if: '${{ github.event.inputs.environment }}' == 'PROD'
+    if: environment == 'PROD'
     steps:
       - name: Git checkout branch
         uses: actions/checkout@v2
